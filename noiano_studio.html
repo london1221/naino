@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Noiano — Music Studio</title>
+<style>
+:root{--ink:#20233a;--muted:#777b91;--line:#e6e8f0;--paper:#fff;--bg:#f4f5fb;--purple:#7157e8;--purple2:#8d79ff;--mint:#baf4df;--coral:#ff927f;--shadow:0 12px 35px #25264a12}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,select,input{font:inherit}button{cursor:pointer;border:0}button:focus-visible,select:focus-visible{outline:3px solid #a99cff;outline-offset:2px}
+.topbar{height:76px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;gap:16px;position:sticky;top:0;z-index:5}
+.brand{display:flex;align-items:center;gap:11px;font-size:22px;font-weight:850;letter-spacing:-.8px}.brand-note{width:42px;height:42px;border-radius:14px;background:var(--purple);color:white;display:grid;place-items:center;font-size:27px;box-shadow:0 6px 15px #7157e844}
+.project-name{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}.project-name input{border:1px solid transparent;background:transparent;border-radius:8px;padding:8px;color:var(--ink);font-weight:650;width:150px}.project-name input:hover,.project-name input:focus{border-color:var(--line);background:#fafaff;outline:none}
+.top-actions{display:flex;gap:9px;align-items:center}.btn{padding:10px 15px;border-radius:11px;background:#f0effa;color:var(--ink);font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:7px;transition:.15s}.btn:hover{transform:translateY(-1px);filter:brightness(.98)}.btn.primary{background:var(--purple);color:white}.btn.dark{background:var(--ink);color:#fff}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.app{max-width:1500px;margin:0 auto;padding:24px;display:grid;grid-template-columns:235px minmax(0,1fr);gap:20px}.sidebar,.workspace{min-width:0}.panel{background:var(--paper);border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow)}.side-panel{padding:18px;margin-bottom:15px}.section-title{font-size:11px;font-weight:850;letter-spacing:1.3px;color:#9699ad;margin:0 0 14px;text-transform:uppercase}
+.instrument{display:flex;align-items:center;gap:11px;width:100%;padding:11px;border-radius:12px;background:transparent;text-align:left;margin:4px 0;color:var(--ink)}.instrument:hover{background:#f6f4ff}.instrument.active{background:#efedff;box-shadow:inset 3px 0 var(--purple)}.instrument-icon{height:36px;width:36px;border-radius:10px;background:#f0effa;display:grid;place-items:center;font-size:19px}.instrument.active .instrument-icon{background:#dcd6ff}.instrument strong{display:block;font-size:13px}.instrument small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.field{margin:12px 0}.field label{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:7px}.field select,.field input[type=number]{width:100%;border:1px solid var(--line);background:#fbfbfe;padding:10px;border-radius:9px;color:var(--ink);outline:none}.field select:focus,.field input:focus{border-color:var(--purple)}
+.tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.tool{padding:10px 3px;border:1px solid var(--line);background:white;border-radius:10px;color:var(--muted);font-size:11px;font-weight:750}.tool b{display:block;font-size:18px;color:var(--ink);margin-bottom:3px}.tool.active{border-color:var(--purple);background:#f0edff;color:var(--purple)}.tool.active b{color:var(--purple)}
+.workspace-head{padding:17px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line)}.workspace-head h1{font-size:18px;margin:0;letter-spacing:-.4px}.workspace-head p{margin:4px 0 0;color:var(--muted);font-size:12px}.transport{display:flex;align-items:center;gap:7px}.round{height:38px;width:38px;border-radius:12px;background:#f0effa;color:var(--ink);font-size:16px}.round.play{background:var(--purple);color:#fff}.tempo{display:flex;align-items:center;gap:6px;margin-left:6px;font-size:12px;color:var(--muted);font-weight:700}.tempo input{width:52px;border:1px solid var(--line);padding:8px;border-radius:8px}
+.score-wrap{padding:22px 20px 14px;overflow-x:auto}.score-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}.score-toolbar span{font-size:12px;color:var(--muted)}.zoom{display:flex;gap:6px}.zoom button{background:#f2f1fa;border-radius:8px;padding:6px 10px;color:var(--ink)}
+#score{display:block;width:100%;min-width:700px;height:290px;background:#fff;border:1px solid #eeeef6;border-radius:12px;touch-action:manipulation;cursor:crosshair}
+.hint{padding:0 20px 18px;font-size:12px;color:var(--muted)}.hint strong{color:var(--purple)}
+.lower{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.lower .panel{padding:17px 19px}.lower h2{font-size:13px;margin:0 0 12px}.note-list{display:flex;gap:7px;flex-wrap:wrap}.note-chip{padding:7px 9px;border-radius:8px;background:#f3f1ff;color:#5542bf;font-size:11px;font-weight:750}.empty{font-size:12px;color:var(--muted)}
+.status{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}.dot{width:7px;height:7px;border-radius:50%;background:#40c89b}.keyboard{display:flex;gap:3px;height:64px;margin-top:14px;overflow:hidden}.key{flex:1;min-width:16px;background:#fff;border:1px solid #dfe0e9;border-radius:0 0 6px 6px;position:relative}.key.black{background:#282a3b;height:39px;margin:0 -8px;z-index:1;flex:0 0 20px;border:0;border-radius:0 0 4px 4px}.footer{text-align:center;color:#a1a3b4;font-size:11px;padding:10px 0 25px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#24243a;color:#fff;border-radius:12px;padding:11px 16px;font-size:13px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.2s;z-index:20}.toast.show{opacity:1}
+@media(max-width:900px){.app{grid-template-columns:1fr;padding:13px}.sidebar{display:grid;grid-template-columns:1fr 1fr;gap:12px}.side-panel{margin:0}.topbar{padding:0 14px}.project-name{display:none}.top-actions .btn:not(.primary){display:none}.lower{grid-template-columns:1fr}}
+@media(max-width:560px){.brand{font-size:18px}.brand-note{height:36px;width:36px}.topbar{height:65px}.app{padding:10px}.sidebar{grid-template-columns:1fr}.workspace-head{align-items:flex-start;flex-direction:column}.score-wrap{padding:12px}.workspace-head{padding:15px}.top-actions .btn{padding:9px}.tempo{margin-left:0}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><div class="brand-note">♪</div><span>noiano</span></div>
+  <div class="project-name">PROJECT <input id="projectTitle" value="My first score" aria-label="Project name"></div>
+  <div class="top-actions"><button class="btn" id="clearBtn">↺ Clear</button><button class="btn" id="exportBtn">⇩ Export notes</button><button class="btn primary" id="saveBtn">✓ Save draft</button></div>
+</header>
+<main class="app">
+  <aside class="sidebar">
+    <section class="panel side-panel">
+      <h2 class="section-title">Instruments</h2>
+      <button class="instrument active" data-instrument="piano"><span class="instrument-icon">🎹</span><span><strong>Piano</strong><small>Warm acoustic</small></span></button>
+      <button class="instrument" data-instrument="synth"><span class="instrument-icon">〰️</span><span><strong>Synth</strong><small>Soft electronic</small></span></button>
+      <button class="instrument" data-instrument="pluck"><span class="instrument-icon">🎸</span><span><strong>Pluck</strong><small>Bright and short</small></span></button>
+      <button class="instrument" data-instrument="organ"><span class="instrument-icon">🎛️</span><span><strong>Organ</strong><small>Smooth sustained</small></span></button>
+    </section>
+    <section class="panel side-panel">
+      <h2 class="section-title">Score setup</h2>
+      <div class="field"><label for="clef">Clef</label><select id="clef"><option value="treble">Treble clef 𝄞</option><option value="bass">Bass clef 𝄢</option><option value="alto">Alto clef 𝄡</option><option value="tenor">Tenor clef 𝄡</option></select></div>
+      <div class="field"><label for="keySig">Key signature</label><select id="keySig"><option value="C">C major / A minor</option><option value="G">G major (1 ♯)</option><option value="D">D major (2 ♯)</option><option value="F">F major (1 ♭)</option><option value="Bb">B♭ major (2 ♭)</option></select></div>
+      <div class="field"><label for="timeSig">Time signature</label><select id="timeSig"><option>4/4</option><option>3/4</option><option>2/4</option><option>6/8</option></select></div>
+      <div class="field"><label for="measures">Measures <span id="measureValue">4</span></label><input id="measures" type="number" min="1" max="12" value="4"></div>
+    </section>
+    <section class="panel side-panel">
+      <h2 class="section-title">Note duration</h2>
+      <div class="tool-grid" id="durations">
+        <button class="tool" data-duration="1"><b>𝅝</b>Whole</button>
+        <button class="tool" data-duration="2"><b>𝅗𝅥</b>Half</button>
+        <button class="tool active" data-duration="4"><b>♩</b>Quarter</button>
+        <button class="tool" data-duration="8"><b>♪</b>Eighth</button>
+        <button class="tool" data-duration="16"><b>𝅘𝅥𝅯</b>16th</button>
+        <button class="tool" data-duration="32"><b>𝅘𝅥𝅰</b>32nd</button>
+      </div>
+      <div class="field"><label for="accidental">Accidental</label><select id="accidental"><option value="">Natural</option><option value="#">Sharp ♯</option><option value="b">Flat ♭</option><option value="n">Natural ♮</option></select></div>
+      <div class="field"><label for="volume">Volume <span id="volumeValue">70%</span></label><input id="volume" type="range" min="0" max="100" value="70" style="width:100%;accent-color:var(--purple)"></div>
+    </section>
+  </aside>
+  <section class="workspace">
+    <div class="panel">
+      <div class="workspace-head">
+        <div><h1>Score editor</h1><p>Hover to preview a note, click to place it on the staff.</p></div>
+        <div class="transport"><button class="round" id="rewindBtn" title="Rewind">⏮</button><button class="round play" id="playBtn" title="Play">▶</button><button class="round" id="stopBtn" title="Stop">■</button><div class="tempo">♩ <input id="tempo" type="number" min="40" max="240" value="100" aria-label="Tempo"> BPM</div></div>
+      </div>
+      <div class="score-wrap">
+        <div class="score-toolbar"><span><span class="dot" style="display:inline-block;margin-right:6px"></span><span id="statusText">Ready to compose</span></span><div class="zoom"><button id="zoomOut">−</button><button id="zoomIn">+</button></div></div>
+        <canvas id="score" width="1100" height="290" aria-label="Interactive music staff"></canvas>
+      </div>
+      <div class="hint">✦ <strong>Composer tip:</strong> Move over the staff to preview pitch. Click to add a note. Click an existing note to remove it. Playback starts from the beginning.</div>
+    </div>
+    <div class="lower">
+      <section class="panel"><h2>♪ Notes in your score</h2><div class="note-list" id="noteList"><span class="empty">Your melody will appear here.</span></div></section>
+      <section class="panel"><h2>⌁ Piano preview</h2><div class="status"><span class="dot"></span><span id="soundStatus">Audio is ready when you press play or preview a note.</span></div><div class="keyboard" id="keyboard"></div></section>
+    </div>
+  </section>
+</main>
+<div class="footer">noiano · make a little music</div><div class="toast" id="toast"></div>
+<script>
+(() => {
+const canvas=document.getElementById('score'),ctx=canvas.getContext('2d');
+const clefEl=document.getElementById('clef'),measuresEl=document.getElementById('measures');
+let notes=[],duration=4,instrument='piano',hover=null,playing=false,playTimer=null,playIndex=0,zoom=1,audio=null,master=null;
+const $=id=>document.getElementById(id);
+const lineGap=15, staffTop=88, left=92, step=lineGap/2;
+const names=['C','D','E','F','G','A','B'];
+function audioInit(){if(!audio){audio=new (window.AudioContext||window.webkitAudioContext)();master=audio.createGain();master.gain.value=Number($('volume').value)/100;master.connect(audio.destination)}if(audio.state==='suspended')audio.resume();return audio}
+function pitchFromY(y){let diatonic=Math.round((staffTop+4*lineGap-y)/step);let clef=clefEl.value;let base=clef==='bass'?38:clef==='alto'?48:clef==='tenor'?45:64;return base+diatonic}
+function pitchName(midi){let n=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','B♭','B'][((midi%12)+12)%12];return n+(Math.floor(midi/12)-1)}
+function midiFreq(m){return 440*Math.pow(2,(m-69)/12)}
+function playTone(midi,dur=0.3){audioInit();const now=audio.currentTime,osc=audio.createOscillator(),gain=audio.createGain();osc.type=instrument==='synth'?'sawtooth':instrument==='organ'?'square':instrument==='pluck'?'triangle':'sine';osc.frequency.value=midiFreq(midi);gain.gain.setValueAtTime(0.0001,now);gain.gain.exponentialRampToValueAtTime(Math.max(.0002,Number($('volume').value)/100*.16),now+.015);gain.gain.exponentialRampToValueAtTime(.0001,now+dur);osc.connect(gain);gain.connect(master);osc.start(now);osc.stop(now+dur+.03);$('soundStatus').textContent='Playing '+pitchName(midi)}
+function showToast(msg){$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),1900)}
+function resizeCanvas(){const dpr=window.devicePixelRatio||1,w=Math.max(700,canvas.clientWidth);canvas.width=w*dpr;canvas.height=290*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);draw()}
+function draw(){
+ const w=canvas.width/(window.devicePixelRatio||1),h=290;ctx.clearRect(0,0,w,h);ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);
+ const count=Math.max(1,Math.min(12,Number(measuresEl.value)||4)),usable=w-left-25,measureW=usable/count;
+ ctx.strokeStyle='#d8dbe7';ctx.lineWidth=1;
+ for(let i=0;i<5;i++){let y=staffTop+i*lineGap;ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(w-22,y);ctx.stroke()}
+ for(let i=0;i<=count;i++){let x=left+i*measureW;ctx.strokeStyle=i===0||i===count?'#777b91':'#e4e6ef';ctx.lineWidth=i===0||i===count?1.6:1;ctx.beginPath();ctx.moveTo(x,staffTop-8);ctx.lineTo(x,staffTop+4*lineGap+8);ctx.stroke()}
+ ctx.fillStyle='#30334a';ctx.font='43px Georgia';ctx.fillText(clefEl.value==='bass'?'𝄢':clefEl.value==='treble'?'𝄞':'𝄡',20,staffTop+48);
+ ctx.font='bold 13px system-ui';ctx.fillText($('keySig').value==='G'?'♯':$('keySig').value==='D'?'♯ ♯':$('keySig').value==='F'?'♭':$('keySig').value==='Bb'?'♭ ♭':'',left-18,staffTop-12);
+ ctx.fillStyle='#a1a4b7';ctx.font='11px system-ui';for(let i=0;i<count;i++)ctx.fillText(i+1,left+i*measureW+8,staffTop+4*lineGap+31);
+ const all=hover&&!notes.some(n=>n.x===hover.x&&n.midi===hover.midi)?[...notes,{...hover,preview:true}]:notes;
+ all.forEach(n=>drawNote(n,measureW));
+}
+function drawNote(n,measureW){
+ const x=left+(n.x+.5)*measureW,y=staffTop+4*lineGap-(n.midi-(clefEl.value==='bass'?38:clefEl.value==='alto'?48:clefEl.value==='tenor'?45:64))*step;
+ if(y<staffTop-18){for(let yy=staffTop-10;yy>=y;yy-=lineGap){if(Math.round((staffTop+4*lineGap-yy)/step)%2===0){ctx.strokeStyle='#777b91';ctx.beginPath();ctx.moveTo(x-12,yy);ctx.lineTo(x+12,yy);ctx.stroke()}}}
+ if(y>staffTop+4*lineGap+10){for(let yy=staffTop+4*lineGap+10;yy<=y;yy+=lineGap){ctx.strokeStyle='#777b91';ctx.beginPath();ctx.moveTo(x-12,yy);ctx.lineTo(x+12,yy);ctx.stroke()}}
+ ctx.save();ctx.globalAlpha=n.preview?.45:1;
+ if(n.accidental){ctx.fillStyle='#30334a';ctx.font='20px Georgia';ctx.fillText(n.accidental==='b'?'♭':n.accidental==='#'?'♯':'♮',x-24,y+6)}
+ ctx.translate(x,y);ctx.rotate(-.35);ctx.fillStyle=n.preview?'#8d79ff':'#30334a';ctx.strokeStyle=ctx.fillStyle;ctx.lineWidth=1.8;
+ ctx.beginPath();ctx.ellipse(0,0,7,4.8,0,0,Math.PI*2);if(n.duration===1)ctx.stroke();else ctx.fill();ctx.restore();
+ if(n.duration!==1){ctx.strokeStyle=n.preview?'#8d79ff':'#30334a';ctx.lineWidth=1.7;ctx.beginPath();ctx.moveTo(x+6,y);ctx.lineTo(x+6,y-34);ctx.stroke();
+ if(n.duration>=8){let flags=n.duration===8?1:n.duration===16?2:3;ctx.beginPath();ctx.moveTo(x+6,y-34);for(let i=0;i<flags;i++){ctx.quadraticCurveTo(x+21,y-29+i*7,x+9,y-20+i*7)}ctx.stroke()}}
+ ctx.globalAlpha=1;
+}
+function canvasPoint(e){const r=canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+function getGrid(p){const w=canvas.clientWidth,count=Math.max(1,Math.min(12,Number(measuresEl.value)||4)),mw=(w-left-25)/count;return{x:Math.max(0,Math.min(count-1,Math.floor((p.x-left)/mw))),midi:Math.max(24,Math.min(96,pitchFromY(p.y)))}}
+canvas.addEventListener('pointermove',e=>{const p=canvasPoint(e);if(p.x<left||p.x>canvas.clientWidth-20){hover=null;draw();return}hover={...getGrid(p),duration,accidental:$('accidental').value};draw()});
+canvas.addEventListener('pointerleave',()=>{hover=null;draw()});
+canvas.addEventListener('click',e=>{const p=canvasPoint(e),g=getGrid(p);if(p.x<left)return;const found=notes.findIndex(n=>n.x===g.x&&n.midi===g.midi);if(found>=0){notes.splice(found,1);showToast('Note removed')}else{notes.push({...g,duration,accidental:$('accidental').value,order:Date.now()+Math.random()});audioInit();playTone(g.midi,.22);showToast(pitchName(g.midi)+' added')}renderNotes();draw()});
+function renderNotes(){const list=$('noteList');list.innerHTML='';if(!notes.length){list.innerHTML='<span class="empty">Your melody will appear here.</span>';return}notes.forEach((n,i)=>{const b=document.createElement('button');b.className='note-chip';b.textContent=pitchName(n.midi)+' · '+n.duration+'th';b.title='Click to hear this note';b.onclick=()=>playTone(n.midi,.3);list.appendChild(b)})}
+function stop(){playing=false;clearTimeout(playTimer);$('playBtn').textContent='▶';$('statusText').textContent='Playback stopped'}
+function playback(){if(!playing)return;if(playIndex>=notes.length){stop();$('statusText').textContent='Playback complete';return}const ordered=[...notes].sort((a,b)=>a.x-b.x||a.midi-b.midi);const n=ordered[playIndex];playTone(n.midi,Math.max(.12,60/Number($('tempo').value)*4/n.duration));$('statusText').textContent='Playing note '+(playIndex+1)+' of '+ordered.length;playIndex++;playTimer=setTimeout(playback,Math.max(120,60000/Number($('tempo').value)*4/n.duration));}
+$('playBtn').onclick=()=>{if(playing){stop();return}if(!notes.length){showToast('Add a few notes to play your score');return}audioInit();playing=true;playIndex=0;$('playBtn').textContent='Ⅱ';playback()};
+$('stopBtn').onclick=stop;$('rewindBtn').onclick=()=>{stop();playIndex=0;$('statusText').textContent='Rewound to beginning';showToast('Back to the beginning')};
+document.querySelectorAll('.instrument').forEach(b=>b.onclick=()=>{document.querySelectorAll('.instrument').forEach(x=>x.classList.remove('active'));b.classList.add('active');instrument=b.dataset.instrument;showToast(b.querySelector('strong').textContent+' selected')});
+document.querySelectorAll('[data-duration]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-duration]').forEach(x=>x.classList.remove('active'));b.classList.add('active');duration=Number(b.dataset.duration);if(hover){hover.duration=duration;draw()}});
+[clefEl,$('keySig'),$('timeSig'),measuresEl].forEach(el=>el.addEventListener('change',()=>{if(el===measuresEl){el.value=Math.max(1,Math.min(12,Number(el.value)||4));$('measureValue').textContent=el.value;notes=notes.filter(n=>n.x<Number(el.value));renderNotes()}draw()}));
+$('volume').oninput=e=>{if(master)master.gain.value=e.target.value/100;$('volumeValue').textContent=e.target.value+'%'};
+$('clearBtn').onclick=()=>{if(confirm('Clear all notes from this score?')){notes=[];renderNotes();draw();stop();showToast('Score cleared')}};
+$('exportBtn').onclick=()=>{const data={title:$('projectTitle').value,instrument,clef:clefEl.value,key:$('keySig').value,time:$('timeSig').value,tempo:Number($('tempo').value),notes:notes.map(({x,midi,duration,accidental})=>({measure:x+1,pitch:pitchName(midi),midi,duration,accidental}))};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=($('projectTitle').value||'noiano-score').replace(/[^a-z0-9_-]/gi,'-')+'.json';a.click();URL.revokeObjectURL(a.href);showToast('Score exported as JSON')};
+$('saveBtn').onclick=()=>{const data={title:$('projectTitle').value,instrument,clef:clefEl.value,key:$('keySig').value,time:$('timeSig').value,tempo:Number($('tempo').value),notes};try{localStorage.setItem('noiano-draft',JSON.stringify(data));showToast('Draft saved in this browser')}catch(e){showToast('Could not save draft in this browser')}};
+$('zoomIn').onclick=()=>{zoom=Math.min(1.3,zoom+.1);canvas.style.height=(290*zoom)+'px';draw()};$('zoomOut').onclick=()=>{zoom=Math.max(.8,zoom-.1);canvas.style.height=(290*zoom)+'px';draw()};
+const keys=$('keyboard');for(let i=0;i<14;i++){const k=document.createElement('button');k.className='key';k.title=pitchName(60+i);k.onclick=()=>playTone(60+i,.24);keys.appendChild(k);if([0,1,3,4,5].includes(i%7)){const black=document.createElement('button');black.className='key black';black.title=pitchName(61+i);black.onclick=()=>playTone(61+i,.24);keys.appendChild(black)}}
+window.addEventListener('resize',resizeCanvas);resizeCanvas();renderNotes();
+})();
+</script>
+</body>
+</html>
